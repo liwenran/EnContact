@@ -19,7 +19,7 @@ We apply the trained EnContact model to infer contacts between enhancers in situ
 # Installation
 Download EnContact by
 ```shell
-git clone https://github.com/liwenran/DeepTACT
+git clone https://github.com/liwenran/EnContact
 ```
 
 # License
