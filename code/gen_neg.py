@@ -5,7 +5,7 @@ from itertools import combinations, product
 def get_Einfo():
     Einfo = {}
     Chrom = {}
-    fin = open('human_permissive_enhancers_2k.fa')
+    fin = open('human_permissive_enhancers.bed')
     for line in fin:
         line = line.strip().split('\t')
         Einfo[line[3]] = line[1]
@@ -46,7 +46,7 @@ def get_neg_distances():
 	bin4 = pos_values[int(4*each_bin_num)]
 	bin5 = pos_values[num-1]
 	print bin0,bin1,bin2,bin3,bin4,bin5
-	#candidate_distances = sorted(candidate_distances.items, key=lambda d:d[1]) #ascending
+	candidate_distances = sorted(candidate_distances.items, key=lambda d:d[1]) #ascending
 	Bins = [ [] for row in range(5) ]
 	for genes in candidate_distances:
 		if bin0<candidate_distances[genes]  <=bin1:
@@ -97,7 +97,7 @@ def get_neg_rand():
     fout.close()
 
 def GetEnhancerInfo():
-    infofile=open('human_permissive_enhancers_2k.fa')
+    infofile=open('human_permissive_enhancers.bed')
     EnhancerInfo={}
     for line in infofile:
         line=line.strip().split('\t')
@@ -140,6 +140,4 @@ fout = open(cell+'/'+name+'.PN-Rpair.bed', 'w')
 readPairs(cell+'/'+cell+'_1v1_pair.txt', fout, 1)
 readPairs(cell+'/'+name+'.neg.pair-Rpair', fout, 0)
 fout.close()
-
-
 
