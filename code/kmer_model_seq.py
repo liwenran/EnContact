@@ -56,39 +56,6 @@ def countKmer(filename):
     label = np.array(label)
     np.savez(cell+'/kmer/'+filename.split('.')[0]+'_kmer.npz', kmer=feats, label=label)
 
-def evaluate(clf, Y_val, y_pred, y_score):
-    print('\nTesting : '+clf)
-    acc   = metrics.accuracy_score(Y_val, y_pred)
-    print('Test acc: ', acc)
-    precision = metrics.precision_score(Y_val, y_pred)
-    print('Test precision: ', precision)
-    recall = metrics.recall_score(Y_val, y_pred)
-    print('Test recall: ', recall)
-    f1    = metrics.f1_score(Y_val, y_pred)
-    print('Test f1: ', f1)
-    mcc   = metrics.matthews_corrcoef(Y_val, y_pred)
-    print('Test mcc: ', mcc)
-    auroc = metrics.roc_auc_score(Y_val, y_score)
-    print('Test auroc: ', auroc)
-    auprc = metrics.average_precision_score(Y_val, y_score)
-    print('Test auprc: ', auprc)
-    fpr, tpr, thresholds = metrics.roc_curve(Y_val, y_score, pos_label=1)
-    fpr = np.asarray(fpr, dtype="str")
-    tpr = np.asarray(tpr, dtype="str")
-
-    fout=open(cell+'/kmer/result-R'+Type+'.txt', 'a')
-    fout.write(clf+'\n')
-    fout.write('Test accuracy: '+str(acc)+'\n')
-    fout.write('Test f1 score: '+str(f1)+'\n')
-    fout.write('Test precision: '+str(precision)+'\n')
-    fout.write('Test recall: '+str(recall)+'\n')
-    fout.write('Test mcc: '+str(mcc)+'\n')
-    fout.write('Test auroc: '+str(auroc)+'\n')
-    fout.write('Test auprc: '+str(auprc)+'\n')
-    fout.write('fpr'+'\t'+ '\t'.join(fpr.tolist())+'\n')
-    fout.write('tpr'+'\t'+ '\t'.join(tpr.tolist())+'\n')
-    fout.close()
-
 def RandomForest():
 	# Random Forest classification
 	clf=RF(n_estimators=100)
@@ -96,7 +63,7 @@ def RandomForest():
 	y_pred = clf.predict(X_val)
 	y_score = clf.predict_proba(X_val)
 	y_score = y_score[:,1]
-	evaluate('RF',Y_val, y_pred, y_score)
+	auroc = metrics.roc_auc_score(Y_val, y_score)
 
 def logistic():
 	# lr classification
@@ -105,7 +72,7 @@ def logistic():
 	y_pred = clf.predict(X_val)
 	y_score = clf.predict_proba(X_val)
 	y_score = y_score[:,1]
-	evaluate('LR', Y_val, y_pred, y_score)
+	auroc = metrics.roc_auc_score(Y_val, y_score)
 
 def SVM():
 	# SVM classification
@@ -113,7 +80,7 @@ def SVM():
 	clf.fit(X_train,Y_train)
 	y_pred = clf.predict(X_val)
 	y_score = clf.decision_function(X_val)
-	evaluate('SVM',Y_val, y_pred, y_score)
+	auroc = metrics.roc_auc_score(Y_val, y_score)
 
 def load_data():
 	X_train_1 = np.load(cell+'/kmer/enhancer1_B_kmer.npz')['kmer'].astype('float32')
@@ -129,19 +96,4 @@ def load_data():
 	X_val = np.hstack((X_val_1, X_val_2))
 	Y_val = np.load(cell+'/kmer/enhancer1_C_kmer.npz')['label'].astype('int32')
 	return X_train,Y_train,X_val,Y_val
-
-##MAIN
-#countKmer('enhancer1_C.csv')
-#countKmer('enhancer2_C.csv')
-
-#countKmer('enhancer1_B.csv')
-#countKmer('enhancer2_B.csv')
-
-##
-cell = sys.argv[1]
-X_train,Y_train,X_val,Y_val = load_data()
-RandomForest()
-logistic()
-SVM()
-
 
